@@ -30,6 +30,8 @@ print("="*20)
 print("TICKET MÉDIO")
 print("="*20)
 ticket_medio = (faturamento['Valor Final'] / quantidade['Quantidade']).to_frame()
+ticket_medio = ticket_medio.rename(columns={0: "Ticket Médio"})
+
 print(ticket_medio)
 
 #enviar um email
@@ -39,9 +41,23 @@ outlook = win32.Dispatch('outlook.application')
 mail = outlook.createItem(0)
 mail.To = 'viniciusmboniatti@gmail.com'
 mail.Subject = 'Manssage Subject'
-mail.HTMLBody ='<h2> MENSAGEM QUE SERÁ ENVIADA </h2>'
-mail.send()
+mail.HTMLBody =f'''
+<p>Prezado,</p>
+<p>Segue o relatório de vendas</p>
 
+<p>Faturamento por loja</p>
+{faturamento.to_html(formatters={'Valor Final': 'R${:,.2f}'.format})}
+
+<p>Quantidade vendida po loja</p>
+{quantidade.to_html()}
+
+<p>Ticket médio</p>
+{ticket_medio.to_html()}
+
+
+'''
+mail.send()
+#
 # ele envia a mensagem pro email descrito em cima, usando o 
 # outlook enviando pra qual email, tem que estar logado no app 
 # do outlook no PC.
